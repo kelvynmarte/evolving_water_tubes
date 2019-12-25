@@ -35,5 +35,7 @@
     particles.get(i).update();
     particles.get(i).display();
   }
+  
+  //drawEnvirnoment();
 
  }

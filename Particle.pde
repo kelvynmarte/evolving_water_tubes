@@ -61,8 +61,8 @@ class Particle {
         
         // find adjacent colors
         
-        for(int dX = -1; dX < 1; dX ++){
-          for(int dY = -1; dY < 1; dY++){
+        for(int dX = -1; dX <= 1; dX ++){
+          for(int dY = -1; dY <= 1; dY++){
             color pixelColor = get((int)v.x + dX, (int)v.y + dY); 
             if(red(pixelColor) > 0) {
               collisionAheadAtAngle = true;
@@ -108,6 +108,7 @@ class Particle {
 
   // Custom method for drawing the object
   void display() {
+    blendMode(BLEND);
     fill(tubeColor);
     noStroke();
     ellipse(position.x-size/2, position.y-size/2,  size, size);
