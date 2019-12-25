@@ -57,10 +57,20 @@ class Particle {
       boolean collisionAheadAtAngle = false;
       for (float detectionDistance = 3f; detectionDistance < 40; detectionDistance+=.25f){
         PVector v = position.copy().add(PVector.fromAngle(detectionAngle * (float)Math.PI/4f).mult(detectionDistance));
-        color pixelColor = get((int)v.x, (int)v.y);   
-        if(red(pixelColor) > 0) {
-          collisionAheadAtAngle = true;
+          
+        
+        // find adjacent colors
+        
+        for(int dX = -1; dX < 1; dX ++){
+          for(int dY = -1; dY < 1; dY++){
+            color pixelColor = get((int)v.x + dX, (int)v.y + dY); 
+            if(red(pixelColor) > 0) {
+              collisionAheadAtAngle = true;
+            }
+          }
         }
+        
+        
       }
       if(collisionAheadAtAngle && detectionAngle == (directionAngleNumber + addedAngleNumber)){
         particleWillCollideIfContinuing = true;
