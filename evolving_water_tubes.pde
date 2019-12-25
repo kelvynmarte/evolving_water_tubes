@@ -6,9 +6,12 @@
  ArrayList<Particle> particles;
 
  void setup() {
+   long seed = (long)random(1000);
+   noiseSeed(seed);
+   println("Seed value: " + seed);
    background(backgroundColor);
    size(1080, 1080);
-   particleOrign = loadImage("particle_orign_template_05.png");
+   particleOrign = loadImage("particle_orign_template_06.png");
    
    particles = new ArrayList<Particle>();
    // load origin points 
@@ -32,4 +35,5 @@
     particles.get(i).update();
     particles.get(i).display();
   }
+
  }

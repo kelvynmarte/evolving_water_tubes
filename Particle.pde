@@ -5,9 +5,11 @@ class Particle {
   float speed = 1f; 
   float size;
   boolean isAlive = true;
-  float addedAngle = 0;
+
   float lifeTime;
   ArrayList<Integer> directionsWithoutCollision = new ArrayList<Integer>();
+  int directionAngleNumber;
+  int addedAngleNumber = 0;
   
  
   // Contructor
@@ -25,7 +27,6 @@ class Particle {
     
     if (isAlive && lifeTime < frameCount){
       isAlive = false;
-      println("particle died");
       
       if(random(0,3) < 2){
         particles.add(new Particle(position.x-1, position.y));
@@ -33,52 +34,72 @@ class Particle {
       }
 
     }
-    
-    
+ 
     if (isAlive == false) return;
     float temporarySpeed = speed;
      
-    int directionAngleValue = (int) Math.floor((noise(initialPosition.x, initialPosition.y, frameCount/200f) * 8));
+    directionAngleNumber = (int) Math.floor((noise(initialPosition.x, initialPosition.y, frameCount/100f) * 8));
     
-    float r = (float) directionAngleValue * (float) Math.PI / 1f;
+    
+    int resulingDirectionAngleNumber = directionAngleNumber + addedAngleNumber;
+    //if(resulingDirectionAngleNumber > 5) findNewAddedAngleNumber();
+    
+    float r = (float) (directionAngleNumber + addedAngleNumber) * (float) Math.PI / 4f;
     
     
     //System.out.println(r);
-    PVector f = PVector.fromAngle(r + addedAngle);
+    PVector f = PVector.fromAngle(r);
     
     // particle can not go back
-    if(f.x < 0) return;
     
-    //f = PVector.fromAngle((float)Math.PI/2);
-    //System.out.println(f);
-    
+    boolean particleWillCollideIfContinuing = false;
     for (int detectionAngle = 0; detectionAngle < 8; detectionAngle++){
-      boolean particleWillColide = false;
-      for (int detectionDistance = 2; detectionDistance < 10; detectionDistance++){
-        PVector v = position.copy().add(f.copy().mult(detectionDistance));
+      boolean collisionAheadAtAngle = false;
+      for (float detectionDistance = 3f; detectionDistance < 40; detectionDistance+=.25f){
+        PVector v = position.copy().add(PVector.fromAngle(detectionAngle * (float)Math.PI/4f).mult(detectionDistance));
         color pixelColor = get((int)v.x, (int)v.y);   
         if(red(pixelColor) > 0) {
-          particleWillColide = true;
-          //isAlive = false;
+          collisionAheadAtAngle = true;
         }
       }
-      if(particleWillColide && detectionAngle == directionAngleValue){
-        println("finde new direction");
-        addedAngle += Math.PI / 2;
+      if(collisionAheadAtAngle && detectionAngle == (directionAngleNumber + addedAngleNumber)){
+        particleWillCollideIfContinuing = true;
+
       }
-      if(particleWillColide == false){
-        directionsWithoutCollision.add(detectionAngle);  
+      if(collisionAheadAtAngle == false){
+        
+        // filter for directions down
+        if(detectionAngle <= 4) directionsWithoutCollision.add(detectionAngle); 
+         
       }
+    }
+    
+    if(particleWillCollideIfContinuing){
+        //println("finde new direction");
+        //println(directionsWithoutCollision);
+        findNewAddedAngleNumber();
     }
     
     position.add(f.copy().mult(speed));
     
+  }
+  
+  void findNewAddedAngleNumber(){
+    if(directionsWithoutCollision.size() == 0){
+      isAlive = false;
+    }else{
+      int newDirection = directionsWithoutCollision.get((int)random(0,directionsWithoutCollision.size()));
+      addedAngleNumber = newDirection - directionAngleNumber;
+      //println("new direction " + newDirection);
+      //println("added angle number " + addedAngleNumber);
+      //println("direction angle number " + directionAngleNumber);
+    }
   }
 
   // Custom method for drawing the object
   void display() {
     fill(tubeColor);
     noStroke();
-    ellipse(position.x, position.y,  size, size);
+    ellipse(position.x-size/2, position.y-size/2,  size, size);
   }
 }
